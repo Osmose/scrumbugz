@@ -158,12 +158,17 @@ LOGIN_URL = LOGOUT_URL = '/'
 
 
 def browserid_req_args_lazy():
-    from scrum.helpers import static
-    return {
-        'siteName': 'ScrumBugs',
-        'siteLogo': static('img/scrumbugs_favicon.png'),
-    }
+    import urllib
+    from django.contrib.staticfiles import finders
 
+    args = {'siteName': 'ScrumBugs'}
+
+    logo_filename = finders.find('img/scrumbugs_favicon.png')
+    if logo_filename:
+        base64_logo = urllib.quote(open(logo_filename, 'rb').read().encode('base64'))
+        args['siteLogo'] = 'data:image/png;base64,' + base64_logo
+
+    return args
 BROWSERID_REQUEST_ARGS = lazy(browserid_req_args_lazy, dict)()
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
